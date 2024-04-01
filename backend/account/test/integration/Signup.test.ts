@@ -1,9 +1,10 @@
-import {AccountRepositoryDataBase, AccountDAOMemory} from "../../backend/ride/src/infra/repository/AccountRepository";
-import Signup from "../../backend/ride/src/application/usecase/Signup";
-import GetAccount from "../../backend/ride/src/application/usecase/GetAccount";
+import GetAccount from "../../src/application/usecase/GetAccount";
+import Signup from "../../src/application/usecase/Signup";
+import DataBaseConnection, { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
+import MailerGateway from "../../src/infra/gateway/MailerGateway";
+import { AccountRepositoryDataBase } from "../../src/infra/repository/AccountRepository";
 import sinon from "sinon";
-import MailerGateway from "../../backend/ride/src/infra/gateway/MailerGateway";
-import DataBaseConnection, { PgPromisseAdapter } from "../../backend/ride/src/infra/database/DataBaseConnection";
+
 
 let signup: Signup;
 let getAccount : GetAccount;

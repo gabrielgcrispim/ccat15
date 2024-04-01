@@ -1,32 +1,30 @@
-import AcceptRide from "../../backend/ride/src/application/usecase/AcceptRide";
-import GetRide from "../../backend/ride/src/application/usecase/GetRide";
-import RequestRide from "../../backend/ride/src/application/usecase/RequestRide";
-import Signup from "../../backend/ride/src/application/usecase/Signup";
-import StartRide from "../../backend/ride/src/application/usecase/StartRide";
-import { PgPromisseAdapter } from "../../backend/ride/src/infra/database/DataBaseConnection";
-import AccountRepository, { AccountRepositoryDataBase } from "../../backend/ride/src/infra/repository/AccountRepository";
-import RideRepository, { RideRepositoryDataBase } from "../../backend/ride/src/infra/repository/RideRepository";
+import AcceptRide from "../../src/application/usecase/AcceptRide";
+import GetRide from "../../src/application/usecase/GetRide";
+import RequestRide from "../../src/application/usecase/RequestRide";
+import StartRide from "../../src/application/usecase/StartRide";
+import { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
+import AccountGetway from "../../src/infra/gateway/AccountGateway";
+import { AccountGetwayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
+import RideRepository, { RideRepositoryDataBase } from "../../src/infra/repository/RideRepository";
 
 
-let accountRepostory : AccountRepository;
 let rideRepository : RideRepository;
-let signup : Signup;
 let acceptRide : AcceptRide;
 let requestRide : RequestRide;
 let connection : PgPromisseAdapter
 let startRide : StartRide;
 let getRide : GetRide;
+let accountGateway: AccountGetway;
 
 
 beforeEach(() => {
     connection = new PgPromisseAdapter();
-    accountRepostory = new AccountRepositoryDataBase(connection);
+    accountGateway = new AccountGetwayHttp();
     rideRepository = new RideRepositoryDataBase(connection);
-    signup = new Signup(accountRepostory);
-    acceptRide = new AcceptRide(accountRepostory, rideRepository);
-    requestRide = new RequestRide(accountRepostory, rideRepository);
+    acceptRide = new AcceptRide(accountGateway, rideRepository);
+    requestRide = new RequestRide(accountGateway, rideRepository);
     startRide = new StartRide(rideRepository);
-    getRide  = new GetRide(rideRepository, accountRepostory);
+    getRide  = new GetRide(rideRepository, accountGateway);
     
 });
 
@@ -40,7 +38,7 @@ test("Deve mudar o status da corrida para IN_PROGRESS apenas se o status anterio
         "isDriver": true,
         "carPlate": "ABC1234"
     };
-    const outPutDriverAccount = await signup.execute(acountDriverInput);
+    const outPutDriverAccount = await accountGateway.signUp(acountDriverInput);
 
     const acountPassengerInput = {
         "name" : "John Doe",
@@ -48,7 +46,7 @@ test("Deve mudar o status da corrida para IN_PROGRESS apenas se o status anterio
         "cpf": "97456321558",
         "isPassenger": true
     };
-   const outPutPassengerAccount = await signup.execute(acountPassengerInput);
+   const outPutPassengerAccount = await accountGateway.signUp(acountPassengerInput);
    const requestRideInput = {
         passengerId: outPutPassengerAccount.accountId,
         fromLat : 27.8990870709,
@@ -93,7 +91,7 @@ test("Deve lançar uma exceção se o status for diferente de ACCEPTED", async f
         "isDriver": true,
         "carPlate": "ABC1234"
     };
-    const outPutDriverAccount = await signup.execute(acountDriverInput);
+    const outPutDriverAccount = await accountGateway.signUp(acountDriverInput);
 
     const acountPassengerInput = {
         "name" : "John Doe",
@@ -101,7 +99,7 @@ test("Deve lançar uma exceção se o status for diferente de ACCEPTED", async f
         "cpf": "97456321558",
         "isPassenger": true
     };
-   const outPutPassengerAccount = await signup.execute(acountPassengerInput);
+   const outPutPassengerAccount = await accountGateway.signUp(acountPassengerInput);
    const requestRideInput = {
         passengerId: outPutPassengerAccount.accountId,
         fromLat : 27.8990870709,

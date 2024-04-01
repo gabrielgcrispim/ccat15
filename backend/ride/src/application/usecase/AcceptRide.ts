@@ -1,13 +1,13 @@
-import AccountRepository from "../../infra/repository/AccountRepository";
+import { AccountGetwayHttp } from "../../infra/gateway/AccountGatewayHttp";
 import RideRepository from "../../infra/repository/RideRepository";
 
 export default class AcceptRide {
 
-    constructor(readonly accountRepostory : AccountRepository, readonly rideRepository : RideRepository){
+    constructor(readonly accountGateway : AccountGetwayHttp, readonly rideRepository : RideRepository){
     }
 
     async execute (input: Input): Promise<void> {
-        const account = await this.accountRepostory.getById(input.driverId);
+        const account = await this.accountGateway.getById(input.driverId);
         if(!account) throw new Error("Account does not exists");
         if(!account.isDriver) throw new Error("It is not a driver account");
         const ride = await this.rideRepository.getByRideId(input.rideId);

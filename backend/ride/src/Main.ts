@@ -1,26 +1,21 @@
-import Signup from "./application/usecase/Signup";
+
 import RequestRide from "./application/usecase/RequestRide";
 import GetRide from "./application/usecase/GetRide";
-import GetAccount from "./application/usecase/GetAccount";
-import {AccountRepositoryDataBase} from "./infra/repository/AccountRepository";
 import { RideRepositoryDataBase } from "./infra/repository/RideRepository";
 import { PgPromisseAdapter } from "./infra/database/DataBaseConnection";
 import { ExpressAdapter } from "./infra/http/HttpServer";
 import MainController from "./infra/http/MainController";
 import Registry from "./infra/di/Registry";
+import { AccountGetwayHttp } from "./infra/gateway/AccountGatewayHttp";
 
 const httpServer = new ExpressAdapter();
 const connection = new PgPromisseAdapter();
-const accountRepository = new AccountRepositoryDataBase(connection);
+const accountGateway = new AccountGetwayHttp();
 const rideRepository = new RideRepositoryDataBase(connection);
-const getRide = new GetRide(rideRepository, accountRepository);
-const requestRide = new RequestRide(accountRepository, rideRepository);
-const account = new GetAccount(accountRepository);
-const signup = new Signup(accountRepository);
-const registry = Registry.getInstance();
-registry.register("signup", signup);
+const getRide = new GetRide(rideRepository, accountGateway);
+const requestRide = new RequestRide(accountGateway, rideRepository);
+const registry = Registry.getInstance();;
 registry.register("getRide", getRide);
 registry.register("requestRide", requestRide);
-registry.register("account", account);
 new MainController(httpServer);
 httpServer.listen(3000);

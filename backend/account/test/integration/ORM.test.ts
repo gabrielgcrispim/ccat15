@@ -1,9 +1,9 @@
-import { PgPromisseAdapter } from "../../backend/ride/src/infra/database/DataBaseConnection";
-import crypto from "crypto";
-import AccountModel from "../../backend/ride/src/infra/model/AccountModel";
-import ORM from "../../backend/ride/src/infra/orm/ORM";
-import { AccountRepositoryORMDataBase } from "../../backend/ride/src/infra/repository/AccountRepository";
-import Account from "../../backend/ride/src/domain/Account";
+import Account from "../../src/domain/Account";
+import { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
+import AccountModel from "../../src/infra/model/AccountModel";
+import ORM from "../../src/infra/orm/ORM";
+import { AccountRepositoryORMDataBase } from "../../src/infra/repository/AccountRepository";
+
 
 test("Deve testar o ORM", async function() {
 

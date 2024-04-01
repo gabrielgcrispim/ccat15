@@ -1,25 +1,23 @@
-import {AccountRepositoryDataBase } from "../../backend/ride/src/infra/repository/AccountRepository";
-import RequestRide from "../../backend/ride/src/application/usecase/RequestRide";
-import Signup from "../../backend/ride/src/application/usecase/Signup";
 import sinon from "sinon";
-import DataBaseConnection, { PgPromisseAdapter } from "../../backend/ride/src/infra/database/DataBaseConnection";
-import RideRepository, {RideRepositoryDataBase} from "../../backend/ride/src/infra/repository/RideRepository";
-import GetRide from "../../backend/ride/src/application/usecase/GetRide";
+import RequestRide from "../../src/application/usecase/RequestRide";
+import RideRepository, { RideRepositoryDataBase } from "../../src/infra/repository/RideRepository";
+import DataBaseConnection, { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
+import GetRide from "../../src/application/usecase/GetRide";
+import AccountGetway from "../../src/infra/gateway/AccountGateway";
+import { AccountGetwayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
 
-let requestRide : RequestRide;
-let signUp : Signup;
 let rideRepository : RideRepository;
 let connection : DataBaseConnection;
-let accountRepository : AccountRepositoryDataBase;
 let getRide : GetRide;
+let accountGetway: AccountGetway;
+let requestRide: RequestRide;
 
 beforeEach(function() { 
     connection = new PgPromisseAdapter();
-    accountRepository = new AccountRepositoryDataBase(connection);
+    accountGetway = new AccountGetwayHttp();
     rideRepository = new RideRepositoryDataBase(connection);
-    requestRide = new RequestRide(accountRepository, rideRepository);
-    signUp = new Signup(accountRepository);
-    getRide = new GetRide(rideRepository, accountRepository);
+    requestRide = new RequestRide(accountGetway, rideRepository);
+    getRide = new GetRide(rideRepository, accountGetway);
 });
 
 test("Solicita uma corrida se o usuário for um passageiro", async function() {
@@ -30,7 +28,7 @@ test("Solicita uma corrida se o usuário for um passageiro", async function() {
         "isPassenger": true
     };
 
-   const outPutSignUp = await signUp.execute(newAccount);
+   const outPutSignUp = await accountGetway.signUp(newAccount);
 
     //Given
     const input = {
@@ -65,7 +63,7 @@ test("Deve lançar uma exceção caso o usuário tenha corridas com status difer
         "isPassenger": true
     };
 
-   const outPutSignUp = await signUp.execute(newAccount);
+   const outPutSignUp = await accountGetway.signUp(newAccount);
 
     //Given
     const input = {
@@ -90,7 +88,7 @@ test("Deve lançar uma exceção caso o usuário não seja um passageiro", async
         "carPlate": "ABC1234"
     };
 
-   const outPutSignUp = await signUp.execute(newAccount);
+   const outPutSignUp = await accountGetway.signUp(newAccount);
 
     //Given
     const input = {

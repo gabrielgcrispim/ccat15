@@ -1,22 +1,21 @@
-import AcceptRide from "../../backend/ride/src/application/usecase/AcceptRide";
-import FinishRide from "../../backend/ride/src/application/usecase/FinishRide";
-import GetRide from "../../backend/ride/src/application/usecase/GetRide";
-import ProcessPayment from "../../backend/ride/src/application/usecase/ProcessPayment";
-import RequestRide from "../../backend/ride/src/application/usecase/RequestRide";
-import Signup from "../../backend/ride/src/application/usecase/Signup";
-import StartRide from "../../backend/ride/src/application/usecase/StartRide";
-import UpdatePosition from "../../backend/ride/src/application/usecase/UpdatePosition";
-import { PgPromisseAdapter } from "../../backend/ride/src/infra/database/DataBaseConnection";
-import PaymentGetway, { CreditCardPaymentGetway } from "../../backend/ride/src/infra/gateway/PaymentGateway";
-import AccountRepository, { AccountRepositoryDataBase } from "../../backend/ride/src/infra/repository/AccountRepository";
-import PositionRepository, { PositionRepositoryDatabase } from "../../backend/ride/src/infra/repository/PositionRepository";
-import RideRepository, { RideRepositoryDataBase } from "../../backend/ride/src/infra/repository/RideRepository";
+
 import sinon from "sinon";
+import AcceptRide from "../../src/application/usecase/AcceptRide";
+import FinishRide from "../../src/application/usecase/FinishRide";
+import GetRide from "../../src/application/usecase/GetRide";
+import ProcessPayment from "../../src/application/usecase/ProcessPayment";
+import RequestRide from "../../src/application/usecase/RequestRide";
+import StartRide from "../../src/application/usecase/StartRide";
+import UpdatePosition from "../../src/application/usecase/UpdatePosition";
+import { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
+import PaymentGetway, { CreditCardPaymentGetway } from "../../src/infra/gateway/PaymentGateway";
+import PositionRepository, { PositionRepositoryDatabase } from "../../src/infra/repository/PositionRepository";
+import RideRepository, { RideRepositoryDataBase } from "../../src/infra/repository/RideRepository";
+import AccountGetway from "../../src/infra/gateway/AccountGateway";
+import { AccountGetwayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
 
 
-let accountRepostory : AccountRepository;
 let rideRepository : RideRepository;
-let signup : Signup;
 let acceptRide : AcceptRide;
 let requestRide : RequestRide;
 let connection : PgPromisseAdapter
@@ -27,18 +26,18 @@ let positionRepository : PositionRepository;
 let finishRide : FinishRide;
 let processPayment : ProcessPayment;
 let paymentGetway: PaymentGetway;
+let accountGateway: AccountGetway;
 
 
 beforeEach(() => {
     connection = new PgPromisseAdapter();
-    accountRepostory = new AccountRepositoryDataBase(connection);
+    accountGateway = new AccountGetwayHttp();
     rideRepository = new RideRepositoryDataBase(connection);
     positionRepository = new PositionRepositoryDatabase(connection);
-    signup = new Signup(accountRepostory);
-    acceptRide = new AcceptRide(accountRepostory, rideRepository);
-    requestRide = new RequestRide(accountRepostory, rideRepository);
+    acceptRide = new AcceptRide(accountGateway, rideRepository);
+    requestRide = new RequestRide(accountGateway, rideRepository);
     startRide = new StartRide(rideRepository);
-    getRide  = new GetRide(rideRepository, accountRepostory);
+    getRide  = new GetRide(rideRepository, accountGateway);
     updatePosition = new UpdatePosition(positionRepository, rideRepository);
     paymentGetway = new CreditCardPaymentGetway();
     processPayment = new ProcessPayment(rideRepository, paymentGetway);
@@ -55,7 +54,7 @@ test("Deve mudar o status da corrida para IN_PROGRESS apenas se o status anterio
         "isDriver": true,
         "carPlate": "ABC1234"
     };
-    const outPutDriverAccount = await signup.execute(acountDriverInput);
+    const outPutDriverAccount = await accountGateway.signUp(acountDriverInput);
 
     const acountPassengerInput = {
         "name" : "John Doe",
@@ -63,7 +62,7 @@ test("Deve mudar o status da corrida para IN_PROGRESS apenas se o status anterio
         "cpf": "97456321558",
         "isPassenger": true
     };
-   const outPutPassengerAccount = await signup.execute(acountPassengerInput);
+   const outPutPassengerAccount = await accountGateway.signUp(acountPassengerInput);
    const requestRideInput = {
         passengerId: outPutPassengerAccount.accountId,
         fromLat: -27.584905257808835,

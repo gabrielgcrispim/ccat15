@@ -1,4 +1,5 @@
-import Cpf from "../../backend/ride/src/vo/Cpf";
+import Cpf from "../../src/vo/Cpf";
+
 
 test.each([
 	"97456321558",

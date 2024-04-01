@@ -1,36 +1,34 @@
-import AcceptRide from "../../backend/ride/src/application/usecase/AcceptRide";
-import GetRide from "../../backend/ride/src/application/usecase/GetRide";
-import RequestRide from "../../backend/ride/src/application/usecase/RequestRide";
-import Signup from "../../backend/ride/src/application/usecase/Signup";
-import StartRide from "../../backend/ride/src/application/usecase/StartRide";
-import UpdatePosition from "../../backend/ride/src/application/usecase/UpdatePosition";
-import DataBaseConnection, { PgPromisseAdapter } from "../../backend/ride/src/infra/database/DataBaseConnection";
-import AccountRepository, { AccountRepositoryDataBase } from "../../backend/ride/src/infra/repository/AccountRepository";
-import PositionRepository, { PositionRepositoryDatabase } from "../../backend/ride/src/infra/repository/PositionRepository";
-import RideRepository, { RideRepositoryDataBase } from "../../backend/ride/src/infra/repository/RideRepository";
+import AcceptRide from "../../src/application/usecase/AcceptRide";
+import GetRide from "../../src/application/usecase/GetRide";
+import RequestRide from "../../src/application/usecase/RequestRide";
+import StartRide from "../../src/application/usecase/StartRide";
+import UpdatePosition from "../../src/application/usecase/UpdatePosition";
+import DataBaseConnection, { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
+import AccountGetway from "../../src/infra/gateway/AccountGateway";
+import { AccountGetwayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
+import PositionRepository, { PositionRepositoryDatabase } from "../../src/infra/repository/PositionRepository";
+import RideRepository, { RideRepositoryDataBase } from "../../src/infra/repository/RideRepository";
 
 let rideRepository : RideRepository;
-let positionRepository : PositionRepository;
-let accountRepostory : AccountRepository;
-let signup : Signup;
 let acceptRide : AcceptRide;
 let requestRide : RequestRide;
 let connection : DataBaseConnection;
 let startRide : StartRide;
 let updatePosition : UpdatePosition;
 let getRide : GetRide;
+let positionRepository: PositionRepository
+let accountGateway: AccountGetway;
 
 beforeEach(() => {
     connection = new PgPromisseAdapter();
+    accountGateway = new AccountGetwayHttp();
     rideRepository = new RideRepositoryDataBase(connection);
     positionRepository = new PositionRepositoryDatabase(connection);
-    accountRepostory = new AccountRepositoryDataBase(connection);
-    signup = new Signup(accountRepostory);
-    acceptRide = new AcceptRide(accountRepostory, rideRepository);
-    requestRide = new RequestRide(accountRepostory, rideRepository);
+    acceptRide = new AcceptRide(accountGateway, rideRepository);
+    requestRide = new RequestRide(accountGateway, rideRepository);
     updatePosition = new UpdatePosition(positionRepository, rideRepository);
     startRide = new StartRide(rideRepository);
-    getRide = new GetRide(rideRepository, accountRepostory);
+    getRide = new GetRide(rideRepository, accountGateway);
 });
 
 test("Deve criar um novo registro na tabela position somente se o status da corrida estiver em IN_PROGRESS", async function() {
@@ -42,7 +40,7 @@ test("Deve criar um novo registro na tabela position somente se o status da corr
         "isDriver": true,
         "carPlate": "ABC1234"
     };
-    const outPutDriverAccount = await signup.execute(acountDriverInput);
+    const outPutDriverAccount = await accountGateway.signUp(acountDriverInput);
 
     const acountPassengerInput = {
         "name" : "John Doe",
@@ -50,7 +48,7 @@ test("Deve criar um novo registro na tabela position somente se o status da corr
         "cpf": "97456321558",
         "isPassenger": true
     };
-   const outPutPassengerAccount = await signup.execute(acountPassengerInput);
+   const outPutPassengerAccount = await accountGateway.signUp(acountPassengerInput);
    const requestRideInput = {
         passengerId: outPutPassengerAccount.accountId,
         fromLat: -27.584905257808835,
@@ -113,7 +111,7 @@ test("Deve lançar uma exceção se o status da corrida não for IN_PROGRESS", a
         "isDriver": true,
         "carPlate": "ABC1234"
     };
-    const outPutDriverAccount = await signup.execute(acountDriverInput);
+    const outPutDriverAccount = await accountGateway.signUp(acountDriverInput);
 
     const acountPassengerInput = {
         "name" : "John Doe",
@@ -121,7 +119,7 @@ test("Deve lançar uma exceção se o status da corrida não for IN_PROGRESS", a
         "cpf": "97456321558",
         "isPassenger": true
     };
-   const outPutPassengerAccount = await signup.execute(acountPassengerInput);
+   const outPutPassengerAccount = await accountGateway.signUp(acountPassengerInput);
    const requestRideInput = {
         passengerId: outPutPassengerAccount.accountId,
         fromLat : 27.8990870709,
