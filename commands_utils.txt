@@ -1,0 +1,4 @@
+#Run test
+npx jest
+#Start server
+npx ts-node src/api.js
