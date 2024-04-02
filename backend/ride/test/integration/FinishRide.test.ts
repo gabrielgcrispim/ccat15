@@ -1,16 +1,15 @@
 import AcceptRide from "../../src/application/usecase/AcceptRide";
 import FinishRide from "../../src/application/usecase/FinishRide";
 import GetRide from "../../src/application/usecase/GetRide";
-import ProcessPayment from "../../src/application/usecase/ProcessPayment";
 import RequestRide from "../../src/application/usecase/RequestRide";
 import StartRide from "../../src/application/usecase/StartRide";
 import UpdatePosition from "../../src/application/usecase/UpdatePosition";
 import { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
 import AccountGetway from "../../src/infra/gateway/AccountGateway";
 import { AccountGetwayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
-import PaymentGetway, { CreditCardPaymentGetway } from "../../src/infra/gateway/PaymentGateway";
 import PositionRepository, { PositionRepositoryDatabase } from "../../src/infra/repository/PositionRepository";
 import RideRepository, { RideRepositoryDataBase } from "../../src/infra/repository/RideRepository";
+import ProcessPayment, { CreditCardPaymentGetway } from "../../src/infra/gateway/ProcessPayment";
 
 
 
@@ -24,7 +23,6 @@ let updatePosition: UpdatePosition;
 let positionRepository : PositionRepository;
 let finishRide : FinishRide;
 let processPayment: ProcessPayment;
-let paymentGateway: PaymentGetway;
 let accountGateway: AccountGetway;
 
 
@@ -38,9 +36,8 @@ beforeEach(() => {
     startRide = new StartRide(rideRepository);
     getRide  = new GetRide(rideRepository, accountGateway);
     updatePosition = new UpdatePosition(positionRepository, rideRepository);
-    paymentGateway = new CreditCardPaymentGetway();
-    processPayment = new ProcessPayment(rideRepository, paymentGateway);
-    finishRide = new FinishRide(rideRepository, processPayment);
+    processPayment = new CreditCardPaymentGetway();
+    finishRide = new FinishRide(rideRepository, processPayment, accountGateway);
     
 });
 

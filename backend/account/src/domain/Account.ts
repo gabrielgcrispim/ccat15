@@ -10,35 +10,40 @@ export default class Account {
    private cpf : Cpf;
    private carPlate? : CarPlate;
 
-   private  constructor (readonly accountId : string, email: string, name : string, 
-        cpf: string, readonly isPassenger : boolean, readonly isDriver : boolean, carPlate?: string) {
+   private constructor (readonly accountId : string, email: string, name : string, 
+        cpf: string, readonly isPassenger : boolean, readonly isDriver : boolean, readonly creditCardToken : string,  carPlate?: string) {
             this.name = new Name(name);
             this.email = new Email(email);
             this.cpf = new Cpf(cpf);
             if(isDriver && carPlate) this.carPlate = new CarPlate(carPlate);
     }
 
-    static create (email: string,  name : string,  cpf: string,  isPassenger : boolean,  isDriver : boolean,  carPlate?: string) {
+    static create (email: string,  name : string,  cpf: string, isPassenger : boolean, isDriver: boolean, carPlate?: string) {
         const accountId = crypto.randomUUID();
-        return new Account(accountId, email, name, cpf, isPassenger, isDriver, carPlate);
+        const creditCardAToken = crypto.randomUUID();
+        return new Account(accountId, email, name, cpf, isPassenger, isDriver, creditCardAToken, carPlate);
     }
 
-    static restore (accountId: string, email: string,  name : string,  cpf: string,  isPassenger : boolean,  isDriver : boolean,  carPlate?: string) {
-        return new Account(accountId, email, name, cpf, isPassenger, isDriver, carPlate);
+    static restore (accountId: string, email: string,  name : string,  cpf: string,  isPassenger : boolean,  isDriver : boolean, creditCardToken : string,  carPlate?: string) {
+        return new Account(accountId, email, name, cpf, isPassenger, isDriver, creditCardToken, carPlate);
     }
 
+    //VO
     getName() {
        return this.name.getValue();
     }
 
+     //VO
     getEmail() {
         return this.email.getValue();
      }
 
+      //VO
      getCpf() {
         return this.cpf.getValue();
      }
 
+      //VO
      getCarPlate() {
         return this.carPlate?.getValue();
      }

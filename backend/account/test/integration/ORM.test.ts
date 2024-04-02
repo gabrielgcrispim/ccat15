@@ -8,11 +8,12 @@ import { AccountRepositoryORMDataBase } from "../../src/infra/repository/Account
 test("Deve testar o ORM", async function() {
 
     const accountId = crypto.randomUUID();
-    const accountModel = new AccountModel(accountId, "John Doe", "jonh.doe@gmail.com", "", "111.111.111-11", true, false);
+    const creditCardToken = crypto.randomUUID();
+    const accountModel = new AccountModel(accountId, "John Doe", "jonh.doe@gmail.com", "", "111.111.111-11", true, false, creditCardToken);
     const connection = new PgPromisseAdapter();
     const orm = new ORM(connection);
     await orm.save(accountModel);
-    const data = await orm.findById(AccountModel, "account_id", accountId);
+    const data = await orm.findBy(AccountModel, "account_id", accountId);
     expect(data.accountId).toBe(accountId);
     expect(data.name).toBe("John Doe");
     expect(data.email).toBe("jonh.doe@gmail.com");
@@ -30,7 +31,7 @@ test.only("Deve testar o ORM com um Aggregate real", async function() {
     const orm = new ORM(connection);
     const accountRepository = new AccountRepositoryORMDataBase(connection);
     await accountRepository.save(account);
-    const data = await orm.findById(AccountModel, "account_id", accountId);
+    const data = await orm.findBy(AccountModel, "account_id", accountId);
     expect(data.accountId).toBe(accountId);
     expect(data.name).toBe("John Doe");
     expect(data.email).toBe("jonh.doe@gmail.com");

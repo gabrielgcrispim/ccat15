@@ -9,7 +9,8 @@ create table cccat15.account (
 	cpf text not null,
 	car_plate text null,
 	is_passenger boolean not null default false,
-	is_driver boolean not null default false
+	is_driver boolean not null default false,
+	credit_card_token uuid null
 );
 
 create table cccat15.ride (

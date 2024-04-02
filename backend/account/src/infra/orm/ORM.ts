@@ -5,8 +5,7 @@ export default class ORM {
     constructor(readonly connection: DataBaseConnection) {
     }
 
-    async save(model: any): Promise<void>{
-       
+    async save(model: any){
         const columns = model.columns.map((column: any) => column.column).join(",");
         const values = model.columns.map((column: any, index: number) => `$${index += 1}`);
         const params = model.columns.map((column: any) => model[column.property])
@@ -14,10 +13,9 @@ export default class ORM {
         await this.connection.query(query, params);
     }
 
-    async findById(model: any, field: string, value: string): Promise<any> {
+    async findBy(model: any, field: string, value: string) {
         const query = `select * from ${model.prototype.schema}.${model.prototype.table} where ${field} = $1`;
         const [data] = await this.connection.query(query, [value]);
-        console.log(query);
         const obj = new model();
         for(const column of model.prototype.columns) {
             obj[column.property] = data[column.column];

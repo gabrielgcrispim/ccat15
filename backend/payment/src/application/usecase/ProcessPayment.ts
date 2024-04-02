@@ -1,10 +1,10 @@
-import PaymentGetway from "../../infra/gateway/PaymentGateway"
-import RideRepository from "../../infra/repository/RideRepository"
+import PaymentGetway from "../../infra/gateway/PaymentGateway";
+
 
 export default class ProcessPayment{
 
 
-    constructor(readonly rideRepository: RideRepository, readonly paymentGateway: PaymentGetway) {
+    constructor(readonly paymentGateway: PaymentGetway) {
     }
     
     async execute(input : Input): Promise<void>{

@@ -21,15 +21,15 @@ export class AccountRepositoryORMDataBase implements AccountRepository {
     async save(account: Account) {
             await this.orm.save(AccountModel.create(account));
         }
-    async  getByEmail(email: string): Promise<Account | undefined> {
-            const [account] = await this.connection.query("select * from cccat15.account where email = $1", [email]);;
-            if(!account) return;
-            return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.car_plate);
+    async getByEmail(email: string) {
+           const account = await this.orm.findBy(AccountModel, "email", email);
+           if(!account) return;
+           return account.restoreFromModel();
         }
-    async getById(accountId: string): Promise<Account | undefined> {
+    async getById(accountId: string) {
             const [account] = await this.connection.query("select * from cccat15.account where account_id = $1", [accountId]);
             if(!account) return;
-            return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.car_plate);
+            return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.credit_card_token, account.car_plate);
         }
 
 }
@@ -41,17 +41,17 @@ export class AccountRepositoryDataBase implements AccountRepository {
         }
 
         async save(account: Account) {
-                await this.connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [account.accountId, account.getName(), account.getEmail(), account.getCpf(), account.getCarPlate(), !!account.isPassenger, !!account.isDriver]);
+                await this.connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, credit_card_token) values ($1, $2, $3, $4, $5, $6, $7, $8)", [account.accountId, account.getName(), account.getEmail(), account.getCpf(), account.getCarPlate(), !!account.isPassenger, !!account.isDriver, account.creditCardToken]);
             }
         async  getByEmail(email: string): Promise<Account | undefined> {
                 const [account] = await this.connection.query("select * from cccat15.account where email = $1", [email]);;
                 if(!account) return;
-                return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.car_plate);
+                return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.credit_card_token, account.car_plate);
             }
         async getById(accountId: string): Promise<Account | undefined> {
                 const [account] = await this.connection.query("select * from cccat15.account where account_id = $1", [accountId]);
                 if(!account) return;
-                return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.car_plate);
+                return Account.restore(account.account_id, account.email, account.name, account.cpf, account.is_passenger, account.is_driver, account.credit_card_token, account.car_plate);
             }
     
 }

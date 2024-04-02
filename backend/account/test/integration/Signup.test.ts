@@ -2,7 +2,7 @@ import GetAccount from "../../src/application/usecase/GetAccount";
 import Signup from "../../src/application/usecase/Signup";
 import DataBaseConnection, { PgPromisseAdapter } from "../../src/infra/database/DataBaseConnection";
 import MailerGateway from "../../src/infra/gateway/MailerGateway";
-import { AccountRepositoryDataBase } from "../../src/infra/repository/AccountRepository";
+import { AccountRepositoryDataBase, AccountRepositoryORMDataBase } from "../../src/infra/repository/AccountRepository";
 import sinon from "sinon";
 
 
@@ -52,7 +52,6 @@ test("Deve criar uma conta de um motorista", async function () {
     const outPutSignUp = await signup.execute(input);
     expect(outPutSignUp.accountId).toBeDefined();
     const registeredUser = await getAccount.execute(outPutSignUp.accountId);
-
     expect(registeredUser.email).toBe(input.email);
     expect(registeredUser.name).toBe(input.name);
     expect(registeredUser.cpf).toBe(input.cpf);
